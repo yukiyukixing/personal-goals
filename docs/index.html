@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>个人目标</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- 添加favicon -->
+    <link rel="icon" href="favicon.png">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 多年目标卡片样式 */
+        .big-goal-card {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .year-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .year-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .big-goal-card h2,
+        .year-card h2 {
+            margin-top: 0;
+            padding-bottom: 10px;
+        }
+
+        .big-goal-card h2 {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .year-card h2 {
+            border-bottom: 1px solid #eee;
+            color: #2c3e50;
+        }
+
+        .goal-progress {
+            height: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .big-goal-card .goal-progress {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .year-card .goal-progress {
+            background-color: #e0e0e0;
+        }
+
+        /* 进度条颜色 */
+        .partial {
+            height: 100%;
+            background: linear-gradient(90deg, #f6d365 0%, #fda085 100%);
+            border-radius: 10px;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: width 0.4s ease;
+        }
+
+        .completed {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
+            border-radius: 10px;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: width 0.4s ease;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin: 0;
+        }
+
+        li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        /* 2025年详细目标卡片样式 */
+        .detail-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        .detail-card h2 {
+            color: #2c3e50;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .goal-item {
+            margin-bottom: 25px;
+        }
+
+        .goal-title {
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .progress-container {
+            height: 20px;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .completion-rate {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 容器：用于插入卡片 -->
+    <div class="container" id="container"></div>
+
+    <!-- 先引入 data.js，使得全局变量 window.goalData 可用 -->
+    <script src="data.js"></script>
+
+    <!-- 然后写我们的渲染逻辑 -->
+    <script>
+        // 读取全局变量 window.goalData
+        const goalData = window.goalData;
+
+        // 容器
+        const container = document.getElementById('container');
+
+        // 1. 生成7年大目标卡片
+        const bigGoalCard = createBigGoalCard(goalData["7年大目标"]);
+        container.appendChild(bigGoalCard);
+
+        // 3. 生成2025年详细进度卡片
+        const detailCard2025 = createDetailCard(goalData["2025年目标详细进度"]);
+        container.appendChild(detailCard2025);
+
+        //---------------------------------
+        // 下面是辅助函数，可根据需要做调整
+        //---------------------------------
+
+        function createBigGoalCard(bigGoalData) {
+            const bigGoalCard = document.createElement('div');
+            bigGoalCard.className = 'big-goal-card';
+
+            const title = document.createElement('h2');
+            title.textContent = `7年大目标（${bigGoalData.时段}）`;
+            bigGoalCard.appendChild(title);
+
+            // 计算总体进度
+            const totalProgress = calculateTotalProgress(bigGoalData.详情);
+            const formattedProgress = `${totalProgress}%`;
+
+            // 添加进度文字
+            const progressText = document.createElement('div');
+            progressText.textContent = `总体进度 ${formattedProgress}`;
+            progressText.style.marginBottom = '5px';
+            bigGoalCard.appendChild(progressText);
+
+            // 进度条
+            const progressBarContainer = document.createElement('div');
+            progressBarContainer.className = 'goal-progress';
+            bigGoalCard.appendChild(progressBarContainer);
+
+            const progressBar = document.createElement('div');
+            progressBar.className = 'partial';
+            progressBar.style.width = formattedProgress;
+            progressBarContainer.appendChild(progressBar);
+
+            // 详情
+            const ul = document.createElement('ul');
+            bigGoalData.详情.forEach(item => {
+                const li = document.createElement('li');
+                if (item.累计进度) {
+                    li.textContent = `${item.目标}：当前累计进度${item.累计进度}`;
+                } else {
+                    li.textContent = `${item.目标}：已完成 ${item.累计完成}`;
+                }
+                ul.appendChild(li);
+            });
+            bigGoalCard.appendChild(ul);
+
+            return bigGoalCard;
+        }
+
+        // 计算总体进度的函数
+        function calculateTotalProgress(details) {
+            let totalPercentage = 0;
+
+            details.forEach(item => {
+                let percentage = 0;
+
+                if (item.累计进度) {
+                    // 处理格式如 "0/100" 的进度
+                    const parts = item.累计进度.split('/');
+                    if (parts.length === 2) {
+                        const current = parseFloat(parts[0]);
+                        const total = parseFloat(parts[1]);
+                        if (total > 0) {
+                            percentage = (current / total) * 100;
+                        }
+                    }
+                } else if (item.累计完成) {
+                    // 处理格式如 "95/300" 的完成情况
+                    const parts = item.累计完成.split('/');
+                    if (parts.length === 2) {
+                        const completed = parseFloat(parts[0]);
+                        const target = parseFloat(parts[1]);
+                        if (target > 0) {
+                            percentage = (completed / target) * 100;
+                        }
+                    }
+                }
+
+                totalPercentage += percentage;
+            });
+
+            // 计算平均值并四舍五入到整数
+            const averagePercentage = Math.round(totalPercentage / details.length);
+            return averagePercentage;
+        }
+
+        function createDetailCard(detailData) {
+            const detailCard = document.createElement('div');
+            detailCard.className = 'detail-card';
+
+            const h2 = document.createElement('h2');
+            h2.textContent = '2025年目标详细进度';
+            detailCard.appendChild(h2);
+
+            detailData.forEach(item => {
+                const goalItem = document.createElement('div');
+                goalItem.className = 'goal-item';
+
+                const goalTitle = document.createElement('div');
+                goalTitle.className = 'goal-title';
+
+                // 这里区分一下 已完成 / 已存
+                const rightValue = item.已完成 || item.已存 || '0';
+
+                goalTitle.innerHTML = `
+          <span>${item.目标}</span>
+          <span>${rightValue}</span>
+        `;
+                goalItem.appendChild(goalTitle);
+
+                const progressContainer = document.createElement('div');
+                progressContainer.className = 'progress-container';
+
+                const progressBar = document.createElement('div');
+                progressBar.className = 'progress-bar';
+                progressBar.style.width = item.进度;
+
+                progressContainer.appendChild(progressBar);
+                goalItem.appendChild(progressContainer);
+
+                const progressInfo = document.createElement('div');
+                progressInfo.className = 'progress-info';
+                progressInfo.innerHTML = `
+          <span>0</span>
+          <span class=\"completion-rate\">完成率: ${item.进度}</span>
+          <span>100%</span>
+        `;
+                goalItem.appendChild(progressInfo);
+
+                detailCard.appendChild(goalItem);
+            });
+            return detailCard;
+        }
+    </script>
+</body>
+
+</html>
